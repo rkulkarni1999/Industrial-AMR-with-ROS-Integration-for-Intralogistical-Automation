@@ -1,0 +1,10 @@
+global_costmap: 
+  global_frame: map
+  robot_base_frame: base_link
+
+  update_frequency: 5.0 # may change one of the update rate if error shows.  
+  publish_frequency: 5.0 # may change update rate if error shows 
+  transform_tolerance: 0.2
+
+  static_map: true
+

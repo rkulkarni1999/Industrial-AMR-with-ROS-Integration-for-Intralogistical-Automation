@@ -1,0 +1,172 @@
+<?xml version="1.0"?>
+<robot name="custom_amr_sim" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:arg name="laser_visual" default="false"/>
+  <xacro:arg name="imu_visual"   default="false"/>
+
+<!-- Material -->
+
+  <gazebo reference="base_link">
+    <material>Gazebo/DarkGrey</material>
+  </gazebo>
+
+<!-- Physics -->
+
+  <gazebo reference="base_link"> <!-- Try changing if not working -->
+    <mu1 value="1.0"/> 
+    <mu2 value="1.0"/>
+    <kp value="10000000.0" />
+    <kd value="1.0" />
+    <fdir1 value="1 0 0"/>
+   </gazebo>
+  
+  <gazebo reference="left_wheel">
+    <mu1 value="100.0"/>
+    <mu2 value="100.0"/>
+    <kp value="10000000.0" />
+    <kd value="1.0" />
+    <fdir1 value="1 0 0"/>
+   </gazebo>
+   
+   <gazebo reference="right_wheel">
+    <mu1 value="100.0"/>
+    <mu2 value="100.0"/>
+    <kp value="11000000.0" />
+    <kd value="1.0" />
+    <fdir1 value="1 0 0"/>
+   </gazebo>
+   
+   <gazebo reference="front_right_caster_link">
+    <mu1 value="0.1"/>
+    <mu2 value="0.1"/>
+    <kp value="1000000.0" />
+    <kd value="1.0" />
+    <fdir1 value="1 0 0"/>
+   </gazebo>
+   
+   <gazebo reference="front_left_caster_link">
+    <mu1 value="0.1"/>
+    <mu2 value="0.1"/>
+    <kp value="1000000.0" />
+    <kd value="1.0" />
+    <fdir1 value="1 0 0"/>
+   </gazebo>
+  
+   <gazebo reference="back_left_caster_link">
+    <mu1 value="0.1"/>
+    <mu2 value="0.1"/>
+    <kp value="1000000.0" />
+    <kd value="1.0" />
+    <fdir1 value="1 0 0"/>
+   </gazebo>
+  
+   <gazebo reference="back_right_caster_link">
+    <mu1 value="0.1"/>
+    <mu2 value="0.1"/>
+    <kp value="1000000.0" />
+    <kd value="1.0" />
+    <fdir1 value="1 0 0"/>
+   </gazebo>
+
+<!-- IMU physical properties -->   
+   <gazebo reference="imu_link">
+    <sensor type="imu" name="imu">
+      <always_on>true</always_on>
+      <visualize>$(arg imu_visual)</visualize>
+    </sensor>
+    <material>Gazebo/FlatBlack</material>
+  </gazebo>
+
+<!-- Differential Drive Plugin -->
+<gazebo>
+    <plugin name="amr_differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
+      <commandTopic>cmd_vel</commandTopic> <!-- -->
+      <odometryTopic>odom</odometryTopic> <!-- -->
+      <odometryFrame>odom</odometryFrame> <!-- -->
+      <odometrySource>world</odometrySource> <!-- -->
+      <publishOdomTF>true</publishOdomTF> <!-- -->
+      <robotBaseFrame>base_link</robotBaseFrame> <!-- -->
+      <publishWheelTF>false</publishWheelTF> <!-- -->
+      <publishTf>true</publishTf> <!-- -->
+      <publishWheelJointState>true</publishWheelJointState> <!-- -->
+      <legacyMode>false</legacyMode> <!-- -->
+      <updateRate>30</updateRate> <!-- -->
+      <leftJoint>left_wheel_joint</leftJoint> <!-- -->
+      <rightJoint>right_wheel_joint</rightJoint> <!-- -->
+      <wheelSeparation>0.590</wheelSeparation> <!-- -->
+      <wheelDiameter>0.160</wheelDiameter> <!-- -->
+      <wheelAcceleration>1</wheelAcceleration> <!-- -->
+      <wheelTorque>30</wheelTorque> <!-- -->
+      <rosDebugLevel>na</rosDebugLevel> <!-- -->
+    </plugin>
+  </gazebo>
+
+<!-- IMU Plugin and parameters 
+<gazebo>
+    <plugin name="imu_plugin" filename="libgazebo_ros_imu.so">
+      <alwaysOn>true</alwaysOn>
+      <bodyName>imu_link</bodyName>
+      <frameName>imu_link</frameName>
+      <topicName>imu</topicName>
+      <serviceName>imu_service</serviceName>
+      <gaussianNoise>0.0</gaussianNoise>
+      <updateRate>0</updateRate>
+      <imu>
+        <noise>
+          <type>gaussian</type>
+          <rate>
+            <mean>0.0</mean>
+            <stddev>2e-4</stddev>
+            <bias_mean>0.0000075</bias_mean>
+            <bias_stddev>0.0000008</bias_stddev>
+          </rate>
+          <accel>
+            <mean>0.0</mean>
+            <stddev>1.7e-2</stddev>
+            <bias_mean>0.1</bias_mean>
+            <bias_stddev>0.001</bias_stddev>
+          </accel>
+        </noise>
+      </imu>
+    </plugin>
+  </gazebo>
+-->
+<!-- Laser Scanner -->
+<!-- Laser Scanner -->
+<gazebo reference="laser_link">
+    <material>Gazebo/FlatBlack</material>
+    <sensor type="ray" name="head_hokuyo_sensor">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>$(arg laser_visual)</visualize>
+      <update_rate>20</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>720</samples>
+            <resolution>1</resolution>
+            <min_angle>-1.5708</min_angle>
+            <max_angle>1.5708</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.10</min>
+          <max>30.0</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <!-- Noise parameters based on published spec for Hokuyo laser
+               achieving "+-30mm" accuracy at range < 10m.  A mean of 0.0m and
+               stddev of 0.01m will put 99.7% of samples within 0.03m of the true
+               reading. -->
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_laser.so">
+        <topicName>/scan</topicName>
+        <frameName>laser_link</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+</robot>
